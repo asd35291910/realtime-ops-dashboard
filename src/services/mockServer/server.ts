@@ -82,7 +82,16 @@ const broadcastInterval = setInterval(broadcast, UPDATE_INTERVAL_MS)
 process.on('SIGINT', () => {
   console.log('\nShutting down mock server...')
   clearInterval(broadcastInterval)
+
+  // Close all WebSocket connections
+  wss.clients.forEach((client) => {
+    client.close()
+  })
+
+  // Close WebSocket server
   wss.close(() => {
+    console.log('WebSocket server closed')
+    // Close HTTP server
     server.close(() => {
       console.log('Server stopped')
       process.exit(0)
