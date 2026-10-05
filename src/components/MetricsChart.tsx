@@ -1,0 +1,77 @@
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+
+interface MetricDataPoint {
+  timestamp: number
+  cpu: number
+  memory: number
+  latency: number
+}
+
+interface MetricsChartProps {
+  data: MetricDataPoint[]
+  height?: number
+}
+
+export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
+  const formatTime = (timestamp: number) => {
+    const date = new Date(timestamp)
+    return date.toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }
+
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+        <XAxis
+          dataKey="timestamp"
+          tickFormatter={formatTime}
+          stroke="var(--muted-foreground)"
+          style={{ fontSize: '12px' }}
+        />
+        <YAxis
+          stroke="var(--muted-foreground)"
+          style={{ fontSize: '12px' }}
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: 'var(--popover)',
+            border: '1px solid var(--border)',
+            borderRadius: '8px',
+            color: 'var(--popover-foreground)'
+          }}
+          labelFormatter={(label) => formatTime(Number(label))}
+        />
+        <Legend />
+        <Line
+          type="monotone"
+          dataKey="cpu"
+          stroke="oklch(0.62 0.19 260)"
+          name="CPU %"
+          strokeWidth={2}
+          dot={false}
+        />
+        <Line
+          type="monotone"
+          dataKey="memory"
+          stroke="oklch(0.7 0.17 150)"
+          name="Memory %"
+          strokeWidth={2}
+          dot={false}
+        />
+        <Line
+          type="monotone"
+          dataKey="latency"
+          stroke="oklch(0.7 0.18 50)"
+          name="Latency (ms)"
+          strokeWidth={2}
+          dot={false}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  )
+}
