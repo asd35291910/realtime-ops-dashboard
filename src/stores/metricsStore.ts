@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { NodeMetric, NodeStatus } from '../types/metrics'
+import type { NodeMetric } from '../types/metrics'
 
 interface MetricsState {
   nodes: NodeMetric[]
@@ -8,7 +8,6 @@ interface MetricsState {
 
 interface MetricsActions {
   setNodes: (nodes: NodeMetric[]) => void
-  updateNode: (nodeId: string, updates: Partial<NodeMetric>) => void
   reset: () => void
 }
 
@@ -36,18 +35,10 @@ export const useMetricsStore = create<MetricsStore>((set) => ({
       return { nodes: merged, lastUpdate: Date.now() }
     }),
 
-  updateNode: (nodeId, updates) =>
-    set((state) => ({
-      nodes: state.nodes.map((node) =>
-        node.nodeId === nodeId ? { ...node, ...updates } : node
-      ),
-      lastUpdate: Date.now(),
-    })),
-
   reset: () => set(initialState),
 }))
 
-// Selectores memoizados para evitar re-renders innecesarios
+// Selectors return primitives: Zustand skips the re-render when the value is unchanged
 export const selectCriticalCount = (state: MetricsStore) =>
   state.nodes.filter((node) => node.status === 'CRITICAL').length
 
@@ -76,6 +67,3 @@ export const selectAverageMemory = (state: MetricsStore) => {
   const total = state.nodes.reduce((sum, node) => sum + node.memory, 0)
   return Math.round(total / state.nodes.length)
 }
-
-export const selectNodesByStatus = (status: NodeStatus) => (state: MetricsStore) =>
-  state.nodes.filter((node) => node.status === status)
