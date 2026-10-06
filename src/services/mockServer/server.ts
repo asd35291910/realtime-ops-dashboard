@@ -81,18 +81,30 @@ const broadcastInterval = setInterval(broadcast, UPDATE_INTERVAL_MS)
 
 // Graceful shutdown: close clients, then WebSocket server, then HTTP server.
 // Without this, open WebSocket connections keep the process alive.
+// Repeated signals must not call wss.close() again: each call adds a listener.
+let isShuttingDown = false
+
 function shutdown(signal: string) {
+  if (isShuttingDown) return
+  isShuttingDown = true
+
   console.log(`\n${signal} received, shutting down mock server...`)
   clearInterval(broadcastInterval)
 
-  // Close all WebSocket connections
+  // Safety net: force exit if a connection keeps the process alive
+  setTimeout(() => process.exit(0), 3000).unref()
+
+  // terminate() drops the socket right away; close() waits for the client's
+  // handshake, which never ends if a browser tab keeps reconnecting.
   wss.clients.forEach((client) => {
-    client.close()
+    client.terminate()
   })
 
   // Close WebSocket server
   wss.close(() => {
     console.log('WebSocket server closed')
+    // Drop idle keep-alive connections so server.close() can finish
+    server.closeAllConnections()
     // Close HTTP server
     server.close(() => {
       console.log('Server stopped')
