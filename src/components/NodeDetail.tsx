@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { useEscapeKey } from '../hooks/useEscapeKey'
-import { MetricCard } from './MetricCard'
+import { MetricCard } from '@/components/ui/metric-card'
 import { MetricsChart } from './MetricsChart'
 import { StatusBadge } from './StatusBadge'
 import { XIcon } from 'lucide-react'
