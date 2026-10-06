@@ -159,5 +159,7 @@
     }
   html {
     @apply font-sans;
+    /* Native scrollbars and controls follow the OS scheme, like the palette above */
+    color-scheme: light dark;
     }
 }
