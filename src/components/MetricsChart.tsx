@@ -46,7 +46,7 @@ export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
           yAxisId="latency"
           orientation="right"
           tickFormatter={(value) => `${value}ms`}
-          stroke="oklch(0.7 0.18 50)"
+          stroke="var(--chart-3)"
           style={{ fontSize: '12px' }}
         />
         <Tooltip
@@ -63,7 +63,7 @@ export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
           type="monotone"
           yAxisId="percent"
           dataKey="cpu"
-          stroke="oklch(0.62 0.19 260)"
+          stroke="var(--chart-1)"
           name="CPU %"
           strokeWidth={2}
           dot={false}
@@ -72,7 +72,7 @@ export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
           type="monotone"
           yAxisId="percent"
           dataKey="memory"
-          stroke="oklch(0.7 0.17 150)"
+          stroke="var(--chart-2)"
           name="Memory %"
           strokeWidth={2}
           dot={false}
@@ -81,7 +81,7 @@ export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
           type="monotone"
           yAxisId="latency"
           dataKey="latency"
-          stroke="oklch(0.7 0.18 50)"
+          stroke="var(--chart-3)"
           name="Latency (ms)"
           strokeWidth={2}
           dot={false}

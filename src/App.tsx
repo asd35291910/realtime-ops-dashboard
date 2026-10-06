@@ -129,8 +129,8 @@ function App() {
           stats={[
             { label: 'Total nodes', value: totalNodes },
             { label: 'Critical', value: criticalCount, dotClass: 'bg-destructive' },
-            { label: 'Warning', value: warningCount, dotClass: 'bg-yellow-500' },
-            { label: 'OK', value: okCount, dotClass: 'bg-green-500' },
+            { label: 'Warning', value: warningCount, dotClass: 'bg-warning' },
+            { label: 'OK', value: okCount, dotClass: 'bg-success' },
             { label: 'Avg CPU', value: `${avgCpu}%` },
             { label: 'Avg memory', value: `${avgMemory}%` },
             { label: 'Avg latency', value: `${avgLatency}ms` },
