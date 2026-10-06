@@ -23,9 +23,17 @@ export const useMetricsStore = create<MetricsStore>((set) => ({
   ...initialState,
 
   setNodes: (nodes) =>
-    set({
-      nodes,
-      lastUpdate: Date.now(),
+    set((state) => {
+      // JSON.parse creates new objects for every node. The server only bumps the
+      // timestamp of nodes that were measured again, so reuse the previous object
+      // when it matches: memoized rows can then skip unchanged nodes.
+      const previous = new Map(state.nodes.map((node) => [node.nodeId, node]))
+      const merged = nodes.map((node) => {
+        const prev = previous.get(node.nodeId)
+        return prev && prev.timestamp === node.timestamp ? prev : node
+      })
+
+      return { nodes: merged, lastUpdate: Date.now() }
     }),
 
   updateNode: (nodeId, updates) =>
