@@ -31,8 +31,9 @@ const server = app.listen(PORT, () => {
 // Create WebSocket server
 const wss = new WebSocketServer({ server })
 
-// Initialize mock data: 50 nodes
-let nodes: NodeMetric[] = generateNodes(50)
+// Initialize mock data: 50 nodes by default, override with NODE_COUNT for load tests
+const NODE_COUNT = Number(process.env.NODE_COUNT) || 50
+let nodes: NodeMetric[] = generateNodes(NODE_COUNT)
 
 // Broadcast metrics to all connected clients
 function broadcast() {
