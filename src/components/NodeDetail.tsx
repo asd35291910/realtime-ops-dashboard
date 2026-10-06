@@ -92,7 +92,8 @@ export function NodeDetail({ node, isOpen, onClose, historyData }: NodeDetailPro
           {/* Historical Chart */}
           <div className="border-t border-border pt-6">
             <h3 className="text-sm font-medium mb-4">Historical Metrics</h3>
-            {historyData.length > 0 ? (
+            {/* A line needs two points; with one, the chart would only show loose marks */}
+            {historyData.length > 1 ? (
               <MetricsChart data={historyData} height={300} />
             ) : (
               <div className="h-[300px] flex items-center justify-center text-muted-foreground bg-muted/20 rounded-lg">

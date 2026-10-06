@@ -81,7 +81,9 @@ describe('App', () => {
     expect(screen.getByText('CPU Usage')).toBeInTheDocument()
     expect(screen.getAllByText('91%').length).toBeGreaterThan(1) // table row + detail card
     expect(screen.getByText('Historical Metrics')).toBeInTheDocument()
-    expect(screen.getByTestId('metrics-chart')).toBeInTheDocument()
+    // One reading is not enough for a line: the chart waits for a second one
+    expect(screen.getByText('No historical data available yet')).toBeInTheDocument()
+    expect(screen.queryByTestId('metrics-chart')).not.toBeInTheDocument()
   })
 
   it('closes the node telemetry with the Escape key', () => {
@@ -105,5 +107,7 @@ describe('App', () => {
 
     expect(screen.getAllByText('97%').length).toBeGreaterThan(1)
     expect(screen.queryByText('91%')).not.toBeInTheDocument()
+    // With the second reading the chart appears
+    expect(screen.getByTestId('metrics-chart')).toBeInTheDocument()
   })
 })

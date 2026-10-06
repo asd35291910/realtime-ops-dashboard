@@ -47,7 +47,9 @@ describe('Dashboard with fixed data', () => {
     cy.contains('Memory Usage').parent().should('contain.text', '88%')
     // "Latency" is also a table column header, so match the card label by its element and exact text
     cy.contains('div', /^Latency$/).parent().should('contain.text', '320ms')
-    cy.get('.recharts-wrapper').should('exist')
+    // One reading is not enough for a line: the chart waits for a second one
+    cy.contains('No historical data available yet').should('be.visible')
+    cy.get('.recharts-wrapper').should('not.exist')
 
     // A new snapshot arrives where only node-004 changed
     emitSnapshot(
@@ -55,6 +57,7 @@ describe('Dashboard with fixed data', () => {
     )
 
     cy.contains('CPU Usage').parent().should('contain.text', '97%')
+    cy.get('.recharts-wrapper').should('exist')
   })
 
   it('closes the telemetry with the Escape key', () => {
