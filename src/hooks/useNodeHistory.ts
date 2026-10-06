@@ -27,6 +27,9 @@ export function useNodeHistory(node: NodeMetric | null): MetricDataPoint[] {
       const base = history.nodeId === node.nodeId ? history.points : []
       // New array each time: Recharts freezes the array it receives
       setHistory({ nodeId: node.nodeId, points: [...base.slice(-(MAX_POINTS - 1)), point] })
+    } else {
+      // Deselected: drop the old readings so reopening the same node starts fresh
+      setHistory({ nodeId: null, points: [] })
     }
   }
 

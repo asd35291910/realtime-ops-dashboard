@@ -64,6 +64,19 @@ describe('useNodeHistory', () => {
     expect(result.current[0].cpu).toBe(77)
   })
 
+  it('starts a new history when the same node is selected again after being deselected', () => {
+    const { result, rerender } = renderHook(({ node }) => useNodeHistory(node), {
+      initialProps: { node: makeNode({ cpu: 10, timestamp: 1000 }) as NodeMetric | null },
+    })
+    rerender({ node: makeNode({ cpu: 20, timestamp: 2000 }) })
+    expect(result.current).toHaveLength(2)
+
+    rerender({ node: null })
+    rerender({ node: makeNode({ cpu: 30, timestamp: 3000 }) })
+
+    expect(result.current.map((p) => p.cpu)).toEqual([30])
+  })
+
   it('returns an empty history when the node is deselected', () => {
     const { result, rerender } = renderHook(({ node }) => useNodeHistory(node), {
       initialProps: { node: makeNode() as NodeMetric | null },
