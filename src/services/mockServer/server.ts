@@ -1,6 +1,6 @@
 import express from 'express'
 import { WebSocketServer } from 'ws'
-import { generateNodes, updateNodeMetrics } from './dataGenerator'
+import { generateNodes, updateNodeMetrics } from './generator'
 import type { MetricsSnapshot, NodeMetric } from '../../types/metrics'
 
 const PORT = 3001
