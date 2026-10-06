@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { Badge } from '@/components/ui/badge'
 import type { NodeMetric } from '../types/metrics'
 
@@ -6,6 +8,9 @@ interface NodeListProps {
   onNodeSelect?: (node: NodeMetric) => void
   selectedNodeId?: string
 }
+
+// Fixed row height (h-9) so the virtualizer can compute positions without measuring
+const ROW_HEIGHT = 36
 
 const getStatusVariant = (status: string) => {
   switch (status) {
@@ -21,10 +26,27 @@ const getStatusVariant = (status: string) => {
 }
 
 export function NodeList({ nodes, onNodeSelect, selectedNodeId }: NodeListProps) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Only the rows near the viewport are mounted; the rest do not exist in the DOM
+  const virtualizer = useVirtualizer({
+    count: nodes.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: 8,
+  })
+  const virtualRows = virtualizer.getVirtualItems()
+  // Spacer rows keep the scrollbar size and position as if all rows were rendered
+  const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0
+  const paddingBottom =
+    virtualRows.length > 0 ? virtualizer.getTotalSize() - virtualRows[virtualRows.length - 1].end : 0
+
   return (
-    <div className="rounded-lg border border-border bg-card overflow-x-auto">
+    // Fixed max height: the list scrolls inside, the header stays visible
+    <div ref={scrollRef} className="max-h-[32rem] overflow-auto rounded-lg border border-border bg-card">
       <table className="w-full table-fixed text-sm min-w-[32rem]">
-        <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+        {/* Sticky needs an opaque background, or rows show through while scrolling */}
+        <thead className="sticky top-0 z-10 bg-muted text-xs uppercase tracking-wide text-muted-foreground">
           <tr className="text-left">
             <th className="px-4 py-2 font-medium">Node</th>
             <th className="w-32 px-4 py-2 font-medium">Status</th>
@@ -34,9 +56,17 @@ export function NodeList({ nodes, onNodeSelect, selectedNodeId }: NodeListProps)
           </tr>
         </thead>
         <tbody>
-          {nodes.map((node) => (
+          {paddingTop > 0 && (
+            <tr aria-hidden style={{ height: paddingTop }}>
+              <td colSpan={5} />
+            </tr>
+          )}
+          {virtualRows.map((virtualRow) => {
+            const node = nodes[virtualRow.index]
+            return (
             <tr
               key={node.nodeId}
+              style={{ height: ROW_HEIGHT }}
               tabIndex={0}
               onClick={() => onNodeSelect?.(node)}
               onKeyDown={(e) => {
@@ -54,7 +84,13 @@ export function NodeList({ nodes, onNodeSelect, selectedNodeId }: NodeListProps)
               <td className="px-4 py-1.5 text-right font-semibold tabular-nums">{node.memory}%</td>
               <td className="px-4 py-1.5 text-right font-semibold tabular-nums">{node.latency}ms</td>
             </tr>
-          ))}
+            )
+          })}
+          {paddingBottom > 0 && (
+            <tr aria-hidden style={{ height: paddingBottom }}>
+              <td colSpan={5} />
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
