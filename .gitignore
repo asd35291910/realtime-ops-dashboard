@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Cypress failure artifacts
+cypress/screenshots
+cypress/downloads

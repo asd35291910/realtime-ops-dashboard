@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "e2e": "cypress run",
+    "e2e:open": "cypress open",
     "server": "tsx src/services/mockServer/server.ts"
   },
   "dependencies": {
