@@ -5,10 +5,13 @@ export interface WebSocketClientCallbacks {
   onClose?: () => void
 }
 
+const INITIAL_RECONNECT_DELAY_MS = 1000
+const MAX_RECONNECT_DELAY_MS = 10000
+
 export class WebSocketClient {
   private ws: WebSocket | null = null
   private url: string
-  private reconnectDelay = 1000
+  private reconnectDelay = INITIAL_RECONNECT_DELAY_MS
   private reconnectTimeout: number | null = null
   // False after disconnect(): stops onclose from scheduling a reconnect
   private shouldReconnect = true
@@ -30,7 +33,7 @@ export class WebSocketClient {
 
     socket.onopen = () => {
       console.log(`WebSocket connected to ${this.url}`)
-      this.reconnectDelay = 1000 // Reset delay on successful connection
+      this.reconnectDelay = INITIAL_RECONNECT_DELAY_MS // Reset delay on successful connection
       this.callbacks.onOpen?.()
     }
 
@@ -50,22 +53,14 @@ export class WebSocketClient {
 
       if (!this.shouldReconnect) return
 
-      // Reconnect with exponential backoff (max 10s)
-      const delay = Math.min(this.reconnectDelay, 10000)
+      // Reconnect with exponential backoff (capped)
+      const delay = this.reconnectDelay
       console.log(`Reconnecting in ${delay}ms...`)
 
       this.reconnectTimeout = window.setTimeout(() => {
-        this.reconnectDelay *= 2
+        this.reconnectDelay = Math.min(this.reconnectDelay * 2, MAX_RECONNECT_DELAY_MS)
         this.connect()
       }, delay)
-    }
-  }
-
-  send(data: string) {
-    if (this.ws?.readyState === WebSocket.OPEN) {
-      this.ws.send(data)
-    } else {
-      console.warn('WebSocket is not connected')
     }
   }
 
