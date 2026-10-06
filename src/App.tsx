@@ -14,6 +14,7 @@ import { NodeList } from './components/NodeList'
 import { NodeFilters } from './components/NodeFilters'
 import { NodeSort, type SortOption } from './components/NodeSort'
 import { NodeDetail } from './components/NodeDetail'
+import { StatsBar } from './components/StatsBar'
 import type { NodeMetric, NodeStatus } from './types/metrics'
 
 type FilterOption = NodeStatus | 'ALL'
@@ -39,7 +40,8 @@ function App() {
   // Local state for filtering, sorting, and selection
   const [activeFilter, setActiveFilter] = useState<FilterOption>('ALL')
   const [activeSort, setActiveSort] = useState<SortOption>('nodeId')
-  const [selectedNode, setSelectedNode] = useState<NodeMetric | null>(null)
+  // Keep only the id: the node itself is read from the store so the modal stays live
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
 
   // Store historical data for selected node (last 20 data points)
@@ -49,6 +51,11 @@ function App() {
     memory: number
     latency: number
   }>>>(new Map())
+
+  const selectedNode = useMemo(
+    () => nodes.find(n => n.nodeId === selectedNodeId) ?? null,
+    [nodes, selectedNodeId],
+  )
 
   // Update history when selected node changes (more efficient)
   useEffect(() => {
@@ -94,7 +101,7 @@ function App() {
   }, [filteredNodes, activeSort])
 
   const handleNodeSelect = (node: NodeMetric) => {
-    setSelectedNode(node)
+    setSelectedNodeId(node.nodeId)
     setIsDetailOpen(true)
   }
 
@@ -107,56 +114,28 @@ function App() {
     : []
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-background text-foreground px-6 py-6">
+      <div className="max-w-7xl mx-auto space-y-5">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold mb-2">Real-Time Operational Dashboard</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-semibold mb-1">Real-Time Operational Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
             Monitoring {totalNodes} nodes with live metrics
           </p>
         </div>
 
-        {/* Status Overview */}
-        <div className="grid grid-cols-4 gap-4">
-          <div className="bg-card rounded-lg p-6 border border-border">
-            <div className="text-muted-foreground text-sm mb-2">Total Nodes</div>
-            <div className="text-3xl font-bold">{totalNodes}</div>
-          </div>
-
-          <div className="bg-card rounded-lg p-6 border-2 border-destructive/50">
-            <div className="text-muted-foreground text-sm mb-2">Critical</div>
-            <div className="text-3xl font-bold text-destructive">{criticalCount}</div>
-          </div>
-
-          <div className="bg-card rounded-lg p-6 border-2 border-yellow-500/50">
-            <div className="text-muted-foreground text-sm mb-2">Warning</div>
-            <div className="text-3xl font-bold text-yellow-500">{warningCount}</div>
-          </div>
-
-          <div className="bg-card rounded-lg p-6 border-2 border-green-500/50">
-            <div className="text-muted-foreground text-sm mb-2">OK</div>
-            <div className="text-3xl font-bold text-green-500">{okCount}</div>
-          </div>
-        </div>
-
-        {/* Average Metrics */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-card rounded-lg p-6 border border-border">
-            <div className="text-muted-foreground text-sm mb-2">Avg CPU</div>
-            <div className="text-3xl font-bold">{avgCpu}%</div>
-          </div>
-
-          <div className="bg-card rounded-lg p-6 border border-border">
-            <div className="text-muted-foreground text-sm mb-2">Avg Memory</div>
-            <div className="text-3xl font-bold">{avgMemory}%</div>
-          </div>
-
-          <div className="bg-card rounded-lg p-6 border border-border">
-            <div className="text-muted-foreground text-sm mb-2">Avg Latency</div>
-            <div className="text-3xl font-bold">{avgLatency}ms</div>
-          </div>
-        </div>
+        {/* Overview */}
+        <StatsBar
+          stats={[
+            { label: 'Total nodes', value: totalNodes },
+            { label: 'Critical', value: criticalCount, dotClass: 'bg-destructive' },
+            { label: 'Warning', value: warningCount, dotClass: 'bg-yellow-500' },
+            { label: 'OK', value: okCount, dotClass: 'bg-green-500' },
+            { label: 'Avg CPU', value: `${avgCpu}%` },
+            { label: 'Avg memory', value: `${avgMemory}%` },
+            { label: 'Avg latency', value: `${avgLatency}ms` },
+          ]}
+        />
 
         {/* Filters and Sort */}
         <div className="flex items-center justify-between gap-4">
