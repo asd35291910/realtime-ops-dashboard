@@ -3,7 +3,6 @@ import type { NodeMetric } from '../types/metrics'
 
 interface MetricsState {
   nodes: NodeMetric[]
-  lastUpdate: number
 }
 
 interface MetricsActions {
@@ -15,7 +14,6 @@ type MetricsStore = MetricsState & MetricsActions
 
 const initialState: MetricsState = {
   nodes: [],
-  lastUpdate: 0,
 }
 
 export const useMetricsStore = create<MetricsStore>((set) => ({
@@ -32,7 +30,7 @@ export const useMetricsStore = create<MetricsStore>((set) => ({
         return prev && prev.timestamp === node.timestamp ? prev : node
       })
 
-      return { nodes: merged, lastUpdate: Date.now() }
+      return { nodes: merged }
     }),
 
   reset: () => set(initialState),
