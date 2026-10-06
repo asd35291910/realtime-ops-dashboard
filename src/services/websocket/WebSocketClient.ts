@@ -13,8 +13,6 @@ export class WebSocketClient {
   private url: string
   private reconnectDelay = INITIAL_RECONNECT_DELAY_MS
   private reconnectTimeout: number | null = null
-  // False after disconnect(): stops onclose from scheduling a reconnect
-  private shouldReconnect = true
   private callbacks: WebSocketClientCallbacks = {}
 
   constructor(url: string, callbacks?: WebSocketClientCallbacks) {
@@ -25,7 +23,6 @@ export class WebSocketClient {
   }
 
   connect() {
-    this.shouldReconnect = true
     this.closeCurrentSocket()
 
     const socket = new WebSocket(this.url)
@@ -51,8 +48,6 @@ export class WebSocketClient {
       this.ws = null
       this.callbacks.onClose?.()
 
-      if (!this.shouldReconnect) return
-
       // Reconnect with exponential backoff (capped)
       const delay = this.reconnectDelay
       console.log(`Reconnecting in ${delay}ms...`)
@@ -65,7 +60,6 @@ export class WebSocketClient {
   }
 
   disconnect() {
-    this.shouldReconnect = false
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout)
       this.reconnectTimeout = null
