@@ -78,9 +78,10 @@ wss.on('connection', (ws) => {
 // Start broadcasting updates every 500ms
 const broadcastInterval = setInterval(broadcast, UPDATE_INTERVAL_MS)
 
-// Cleanup on shutdown
-process.on('SIGINT', () => {
-  console.log('\nShutting down mock server...')
+// Graceful shutdown: close clients, then WebSocket server, then HTTP server.
+// Without this, open WebSocket connections keep the process alive.
+function shutdown(signal: string) {
+  console.log(`\n${signal} received, shutting down mock server...`)
   clearInterval(broadcastInterval)
 
   // Close all WebSocket connections
@@ -97,6 +98,10 @@ process.on('SIGINT', () => {
       process.exit(0)
     })
   })
-})
+}
+
+// SIGINT = Ctrl+C in the terminal, SIGTERM = `docker stop`
+process.on('SIGINT', () => shutdown('SIGINT'))
+process.on('SIGTERM', () => shutdown('SIGTERM'))
 
 console.log(`Broadcasting metrics every ${UPDATE_INTERVAL_MS}ms to all connected clients`)
