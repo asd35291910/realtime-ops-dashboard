@@ -24,7 +24,7 @@ export function NodeList({ nodes, onNodeSelect, selectedNodeId }: NodeListProps)
   return (
     <div className="rounded-lg border border-border bg-card overflow-x-auto">
       <table className="w-full table-fixed text-sm min-w-[32rem]">
-        <thead className="bg-muted/40 text-muted-foreground">
+        <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
           <tr className="text-left">
             <th className="px-4 py-2 font-medium">Node</th>
             <th className="w-32 px-4 py-2 font-medium">Status</th>
@@ -46,13 +46,13 @@ export function NodeList({ nodes, onNodeSelect, selectedNodeId }: NodeListProps)
                 selectedNodeId === node.nodeId ? 'bg-muted/60' : ''
               }`}
             >
-              <td className="px-4 py-2 font-mono">{node.nodeId}</td>
-              <td className="px-4 py-2">
+              <td className="px-4 py-1.5 font-mono">{node.nodeId}</td>
+              <td className="px-4 py-1.5">
                 <Badge variant={getStatusVariant(node.status)}>{node.status}</Badge>
               </td>
-              <td className="px-4 py-2 text-right font-semibold tabular-nums">{node.cpu}%</td>
-              <td className="px-4 py-2 text-right font-semibold tabular-nums">{node.memory}%</td>
-              <td className="px-4 py-2 text-right font-semibold tabular-nums">{node.latency}ms</td>
+              <td className="px-4 py-1.5 text-right font-semibold tabular-nums">{node.cpu}%</td>
+              <td className="px-4 py-1.5 text-right font-semibold tabular-nums">{node.memory}%</td>
+              <td className="px-4 py-1.5 text-right font-semibold tabular-nums">{node.latency}ms</td>
             </tr>
           ))}
         </tbody>
