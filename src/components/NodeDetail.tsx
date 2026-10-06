@@ -7,16 +7,15 @@ import { XIcon } from 'lucide-react'
 import type { MetricDataPoint, NodeMetric } from '../types/metrics'
 
 interface NodeDetailProps {
-  node: NodeMetric | null
-  isOpen: boolean
+  node: NodeMetric | null // the modal is open while a node is selected
   onClose: () => void
   historyData: MetricDataPoint[]
 }
 
-export function NodeDetail({ node, isOpen, onClose, historyData }: NodeDetailProps) {
-  useEscapeKey(onClose, isOpen)
+export function NodeDetail({ node, onClose, historyData }: NodeDetailProps) {
+  useEscapeKey(onClose, node !== null)
 
-  if (!isOpen || !node) return null
+  if (!node) return null
 
   return (
     <>

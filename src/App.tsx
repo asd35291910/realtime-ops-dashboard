@@ -1,20 +1,13 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState } from 'react'
 import { useMetricsConnection } from './hooks/useMetricsConnection'
-import { useNodeHistory } from './hooks/useNodeHistory'
+import { useNodeSelection } from './hooks/useNodeSelection'
 import { useVisibleNodes, type FilterOption } from './hooks/useVisibleNodes'
-import {
-  useMetricsStore,
-  selectActiveNodes,
-  selectCriticalCount,
-  selectWarningCount,
-  selectOkCount,
-} from './stores/metricsStore'
+import { useMetricsStore, selectActiveNodes } from './stores/metricsStore'
 import { MetricsOverview } from './components/MetricsOverview'
 import { NodeList } from './components/NodeList'
 import { NodeFilters } from './components/NodeFilters'
 import { NodeSort, type SortOption } from './components/NodeSort'
 import { NodeDetail } from './components/NodeDetail'
-import type { NodeMetric } from './types/metrics'
 
 // The browser connects to the mock server, so in Docker this must be a host-reachable URL.
 // Override it with VITE_WS_URL at build time; the default is for local development.
@@ -25,29 +18,13 @@ function App() {
 
   const nodes = useMetricsStore((state) => state.nodes)
   const totalNodes = useMetricsStore(selectActiveNodes)
-  const criticalCount = useMetricsStore(selectCriticalCount)
-  const warningCount = useMetricsStore(selectWarningCount)
-  const okCount = useMetricsStore(selectOkCount)
 
-  // Local UI state: filter, sort and selection
+  // Local UI state: filter and sort
   const [activeFilter, setActiveFilter] = useState<FilterOption>('ALL')
   const [activeSort, setActiveSort] = useState<SortOption>('nodeId')
-  // Keep only the id: the node itself is read from the store so the modal stays live
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
-  const [isDetailOpen, setIsDetailOpen] = useState(false)
 
-  const selectedNode = useMemo(
-    () => nodes.find((n) => n.nodeId === selectedNodeId) ?? null,
-    [nodes, selectedNodeId],
-  )
-  const selectedNodeHistory = useNodeHistory(selectedNode)
   const visibleNodes = useVisibleNodes(nodes, activeFilter, activeSort)
-
-  // Stable reference so memoized rows do not re-render because of this prop
-  const handleNodeSelect = useCallback((node: NodeMetric) => {
-    setSelectedNodeId(node.nodeId)
-    setIsDetailOpen(true)
-  }, [])
+  const { selectedNode, history, select, clear } = useNodeSelection(nodes)
 
   return (
     <div className="min-h-screen bg-background text-foreground px-6 py-6">
@@ -62,31 +39,13 @@ function App() {
         <MetricsOverview />
 
         <div className="flex items-center justify-between gap-4">
-          <NodeFilters
-            activeFilter={activeFilter}
-            onFilterChange={setActiveFilter}
-            counts={{
-              all: totalNodes,
-              ok: okCount,
-              warning: warningCount,
-              critical: criticalCount,
-            }}
-          />
+          <NodeFilters activeFilter={activeFilter} onFilterChange={setActiveFilter} />
           <NodeSort activeSort={activeSort} onSortChange={setActiveSort} />
         </div>
 
-        <NodeList
-          nodes={visibleNodes}
-          onNodeSelect={handleNodeSelect}
-          selectedNodeId={selectedNode?.nodeId}
-        />
+        <NodeList nodes={visibleNodes} onNodeSelect={select} selectedNodeId={selectedNode?.nodeId} />
 
-        <NodeDetail
-          node={selectedNode}
-          isOpen={isDetailOpen}
-          onClose={() => setIsDetailOpen(false)}
-          historyData={selectedNodeHistory}
-        />
+        <NodeDetail node={selectedNode} onClose={clear} historyData={history} />
       </div>
     </div>
   )
