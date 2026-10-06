@@ -18,9 +18,13 @@ import type { NodeMetric, NodeStatus } from './types/metrics'
 
 type FilterOption = NodeStatus | 'ALL'
 
+// The browser connects to the mock server, so in Docker this must be a host-reachable URL.
+// Override it with VITE_WS_URL at build time; the default is for local development.
+const WS_URL = (import.meta.env.VITE_WS_URL as string | undefined) ?? 'ws://localhost:3001'
+
 function App() {
   // Connect to WebSocket server
-  useMetricsConnection('ws://localhost:3001')
+  useMetricsConnection(WS_URL)
 
   // Get metrics from store
   const nodes = useMetricsStore((state) => state.nodes)
