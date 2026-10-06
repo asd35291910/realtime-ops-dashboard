@@ -1,25 +1,30 @@
 import { Button } from '@/components/ui/button'
-import type { NodeStatus } from '../types/metrics'
-
-type FilterOption = NodeStatus | 'ALL'
+import type { FilterOption } from '../hooks/useVisibleNodes'
+import {
+  useMetricsStore,
+  selectActiveNodes,
+  selectCriticalCount,
+  selectOkCount,
+  selectWarningCount,
+} from '../stores/metricsStore'
 
 interface NodeFiltersProps {
   activeFilter: FilterOption
   onFilterChange: (filter: FilterOption) => void
-  counts: {
-    all: number
-    ok: number
-    warning: number
-    critical: number
-  }
 }
 
-export function NodeFilters({ activeFilter, onFilterChange, counts }: NodeFiltersProps) {
+// Reads the counts itself so the parent does not re-render when they change
+export function NodeFilters({ activeFilter, onFilterChange }: NodeFiltersProps) {
+  const total = useMetricsStore(selectActiveNodes)
+  const ok = useMetricsStore(selectOkCount)
+  const warning = useMetricsStore(selectWarningCount)
+  const critical = useMetricsStore(selectCriticalCount)
+
   const filters: { label: string; value: FilterOption; count: number }[] = [
-    { label: 'All', value: 'ALL', count: counts.all },
-    { label: 'OK', value: 'OK', count: counts.ok },
-    { label: 'Warning', value: 'WARNING', count: counts.warning },
-    { label: 'Critical', value: 'CRITICAL', count: counts.critical },
+    { label: 'All', value: 'ALL', count: total },
+    { label: 'OK', value: 'OK', count: ok },
+    { label: 'Warning', value: 'WARNING', count: warning },
+    { label: 'Critical', value: 'CRITICAL', count: critical },
   ]
 
   return (
