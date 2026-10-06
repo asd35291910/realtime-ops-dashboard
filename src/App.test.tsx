@@ -86,6 +86,23 @@ describe('App', () => {
     expect(screen.queryByTestId('metrics-chart')).not.toBeInTheDocument()
   })
 
+  it('exposes the telemetry as a dialog named after the node', () => {
+    render(<App />)
+
+    fireEvent.click(screen.getByText('node-004'))
+
+    expect(screen.getByRole('dialog', { name: 'node-004' })).toBeInTheDocument()
+  })
+
+  it('closes the node telemetry with the close button', () => {
+    render(<App />)
+    fireEvent.click(screen.getByText('node-004'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
   it('closes the node telemetry with the Escape key', () => {
     render(<App />)
     fireEvent.click(screen.getByText('node-004'))

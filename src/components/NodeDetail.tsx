@@ -1,47 +1,22 @@
-import { useEffect } from 'react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { useEscapeKey } from '../hooks/useEscapeKey'
+import { MetricCard } from './MetricCard'
 import { MetricsChart } from './MetricsChart'
+import { StatusBadge } from './StatusBadge'
 import { XIcon } from 'lucide-react'
-import type { NodeMetric } from '../types/metrics'
+import type { MetricDataPoint, NodeMetric } from '../types/metrics'
 
 interface NodeDetailProps {
   node: NodeMetric | null
   isOpen: boolean
   onClose: () => void
-  historyData: Array<{
-    timestamp: number
-    cpu: number
-    memory: number
-    latency: number
-  }>
+  historyData: MetricDataPoint[]
 }
 
 export function NodeDetail({ node, isOpen, onClose, historyData }: NodeDetailProps) {
-  // Close on ESC key
-  useEffect(() => {
-    if (!isOpen) return
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', handleEsc)
-    return () => document.removeEventListener('keydown', handleEsc)
-  }, [isOpen, onClose])
+  useEscapeKey(onClose, isOpen)
 
   if (!isOpen || !node) return null
-
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'CRITICAL':
-        return 'destructive' as const
-      case 'WARNING':
-        return 'warning' as const
-      case 'OK':
-        return 'success' as const
-      default:
-        return 'secondary' as const
-    }
-  }
 
   return (
     <>
@@ -52,17 +27,21 @@ export function NodeDetail({ node, isOpen, onClose, historyData }: NodeDetailPro
       />
 
       {/* Modal */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-2xl max-h-[90vh] bg-card border border-border rounded-xl shadow-lg overflow-y-auto">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="node-detail-title"
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-2xl max-h-[90vh] bg-card border border-border rounded-xl shadow-lg overflow-y-auto"
+      >
         {/* Header */}
         <div className="sticky top-0 bg-card border-b border-border p-6 flex items-center justify-between">
-          <h2 className="font-mono text-lg font-semibold">{node.nodeId}</h2>
+          <h2 id="node-detail-title" className="font-mono text-lg font-semibold">{node.nodeId}</h2>
           <div className="flex items-center gap-4">
-            <Badge variant={getStatusVariant(node.status)}>
-              {node.status}
-            </Badge>
+            <StatusBadge status={node.status} />
             <Button
               variant="ghost"
               size="icon-sm"
+              aria-label="Close"
               onClick={onClose}
               className="h-8 w-8"
             >
@@ -75,18 +54,9 @@ export function NodeDetail({ node, isOpen, onClose, historyData }: NodeDetailPro
         <div className="p-6 space-y-6">
           {/* Current Metrics */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-sm text-muted-foreground mb-2">CPU Usage</div>
-              <div className="text-3xl font-bold">{node.cpu}%</div>
-            </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-sm text-muted-foreground mb-2">Memory Usage</div>
-              <div className="text-3xl font-bold">{node.memory}%</div>
-            </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-sm text-muted-foreground mb-2">Latency</div>
-              <div className="text-3xl font-bold">{node.latency}ms</div>
-            </div>
+            <MetricCard label="CPU Usage" value={`${node.cpu}%`} />
+            <MetricCard label="Memory Usage" value={`${node.memory}%`} />
+            <MetricCard label="Latency" value={`${node.latency}ms`} />
           </div>
 
           {/* Historical Chart */}
