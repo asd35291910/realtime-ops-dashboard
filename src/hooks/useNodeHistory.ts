@@ -1,12 +1,5 @@
 import { useState } from 'react'
-import type { NodeMetric } from '../types/metrics'
-
-export interface MetricDataPoint {
-  timestamp: number
-  cpu: number
-  memory: number
-  latency: number
-}
+import type { MetricDataPoint, NodeMetric } from '../types/metrics'
 
 const MAX_POINTS = 20
 

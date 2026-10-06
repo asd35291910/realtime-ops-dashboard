@@ -1,11 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-
-interface MetricDataPoint {
-  timestamp: number
-  cpu: number
-  memory: number
-  latency: number
-}
+import type { MetricDataPoint } from '../types/metrics'
 
 interface MetricsChartProps {
   data: MetricDataPoint[]

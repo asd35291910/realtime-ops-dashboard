@@ -13,3 +13,11 @@ export interface MetricsSnapshot {
   nodes: NodeMetric[]
   timestamp: number
 }
+
+// One reading of a node, as plotted in the history chart
+export interface MetricDataPoint {
+  timestamp: number
+  cpu: number
+  memory: number
+  latency: number
+}
