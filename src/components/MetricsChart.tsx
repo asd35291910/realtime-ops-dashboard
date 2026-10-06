@@ -3,10 +3,10 @@ import type { MetricDataPoint } from '../types/metrics'
 
 interface MetricsChartProps {
   data: MetricDataPoint[]
-  height?: number
 }
 
-export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
+// Fills its parent: the height comes from the parent (--chart-height token)
+export function MetricsChart({ data }: MetricsChartProps) {
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp)
     return date.toLocaleTimeString('en-US', {
@@ -18,14 +18,14 @@ export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
         <XAxis
           dataKey="timestamp"
           tickFormatter={formatTime}
           stroke="var(--muted-foreground)"
-          style={{ fontSize: '12px' }}
+          style={{ fontSize: 'var(--text-chart-axis)' }}
         />
         {/* Left axis: CPU and memory (percent), neutral color because two lines share it */}
         <YAxis
@@ -33,7 +33,7 @@ export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
           domain={[0, 100]}
           tickFormatter={(value) => `${value}%`}
           stroke="var(--muted-foreground)"
-          style={{ fontSize: '12px' }}
+          style={{ fontSize: 'var(--text-chart-axis)' }}
         />
         {/* Right axis: latency (ms), tinted like the latency line, separate scale so the percent lines are not flattened */}
         <YAxis
@@ -41,13 +41,13 @@ export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
           orientation="right"
           tickFormatter={(value) => `${value}ms`}
           stroke="var(--chart-3)"
-          style={{ fontSize: '12px' }}
+          style={{ fontSize: 'var(--text-chart-axis)' }}
         />
         <Tooltip
           contentStyle={{
             backgroundColor: 'var(--popover)',
             border: '1px solid var(--border)',
-            borderRadius: '8px',
+            borderRadius: 'var(--chart-tooltip-radius)',
             color: 'var(--popover-foreground)'
           }}
           labelFormatter={(label) => formatTime(Number(label))}

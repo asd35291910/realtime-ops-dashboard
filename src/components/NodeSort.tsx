@@ -30,7 +30,7 @@ export function NodeSort({ activeSort, onSortChange }: NodeSortProps) {
           if (value) onSortChange(value)
         }}
       >
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-(--select-width)">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

@@ -21,7 +21,7 @@ export function NodeDetail({ node, onClose, historyData }: NodeDetailProps) {
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black/40 z-40"
+        className="fixed inset-0 bg-overlay z-(--z-overlay)"
         onClick={onClose}
       />
 
@@ -30,7 +30,7 @@ export function NodeDetail({ node, onClose, historyData }: NodeDetailProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="node-detail-title"
-        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-2xl max-h-[90vh] bg-card border border-border rounded-xl shadow-lg overflow-y-auto"
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-(--z-modal) w-full max-w-2xl max-h-(--modal-max-height) bg-card border border-border rounded-xl shadow-lg overflow-y-auto"
       >
         {/* Header */}
         <div className="sticky top-0 bg-card border-b border-border p-6 flex items-center justify-between">
@@ -63,9 +63,11 @@ export function NodeDetail({ node, onClose, historyData }: NodeDetailProps) {
             <h3 className="text-sm font-medium mb-4">Historical Metrics</h3>
             {/* A line needs two points; with one, the chart would only show loose marks */}
             {historyData.length > 1 ? (
-              <MetricsChart data={historyData} height={300} />
+              <div className="h-(--chart-height)">
+                <MetricsChart data={historyData} />
+              </div>
             ) : (
-              <div className="h-[300px] flex items-center justify-center text-muted-foreground bg-muted/20 rounded-lg">
+              <div className="h-(--chart-height) flex items-center justify-center text-muted-foreground bg-surface-subtle rounded-lg">
                 No historical data available yet
               </div>
             )}

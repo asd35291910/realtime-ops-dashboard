@@ -27,10 +27,10 @@ export function NodeList({ nodes, onNodeSelect, selectedNodeId }: NodeListProps)
 
   return (
     // Fixed max height: the list scrolls inside, the header stays visible
-    <div ref={scrollRef} className="max-h-[32rem] overflow-auto rounded-lg border border-border bg-card">
-      <table className="w-full table-fixed text-sm min-w-[32rem]">
+    <div ref={scrollRef} className="max-h-(--list-max-height) overflow-auto rounded-lg border border-border bg-card">
+      <table className="w-full table-fixed text-sm min-w-(--list-min-width)">
         {/* Sticky needs an opaque background, or rows show through while scrolling */}
-        <thead className="sticky top-0 z-10 bg-muted text-xs uppercase tracking-wide text-muted-foreground">
+        <thead className="sticky top-0 z-(--z-sticky) bg-muted text-xs uppercase tracking-wide text-muted-foreground">
           <tr className="text-left">
             <th className="px-4 py-2 font-medium">Node</th>
             <th className="w-32 px-4 py-2 font-medium">Status</th>

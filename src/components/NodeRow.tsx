@@ -21,8 +21,8 @@ export const NodeRow = memo(function NodeRow({ node, isSelected, onSelect }: Nod
       onKeyDown={(e) => {
         if (e.key === 'Enter') onSelect?.(node)
       }}
-      className={`cursor-pointer border-t border-border hover:bg-muted/40 focus-visible:bg-muted/40 outline-none ${
-        isSelected ? 'bg-muted/60' : ''
+      className={`cursor-pointer border-t border-border hover:bg-row-hover focus-visible:bg-row-hover outline-none ${
+        isSelected ? 'bg-row-selected' : ''
       }`}
     >
       <td className="px-4 py-1.5 font-mono">{node.nodeId}</td>

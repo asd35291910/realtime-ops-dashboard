@@ -18,6 +18,10 @@
     --color-sidebar: var(--sidebar);
     --color-success: var(--success);
     --color-warning: var(--warning);
+    --color-overlay: var(--overlay);
+    --color-row-hover: var(--row-hover);
+    --color-row-selected: var(--row-selected);
+    --color-surface-subtle: var(--surface-subtle);
     --color-chart-5: var(--chart-5);
     --color-chart-4: var(--chart-4);
     --color-chart-3: var(--chart-3);
@@ -77,6 +81,11 @@
     --success: oklch(0.68 0.2 150);
     --warning: oklch(0.8 0.16 85);
     --radius: 0.625rem;
+    /* Derived from --muted, so they follow the light and dark palettes by themselves */
+    --overlay: oklch(0 0 0 / 40%);
+    --row-hover: color-mix(in oklch, var(--muted) 40%, transparent);
+    --row-selected: color-mix(in oklch, var(--muted) 60%, transparent);
+    --surface-subtle: color-mix(in oklch, var(--muted) 30%, transparent);
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: oklch(0.205 0 0);
@@ -85,6 +94,21 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* Layout, sizing and stacking tokens, shared by both color schemes.
+   Used in classes with the parenthesis syntax, e.g. max-h-(--list-max-height) */
+:root {
+    --list-max-height: 32rem;
+    --list-min-width: 32rem;
+    --modal-max-height: 90vh;
+    --chart-height: 300px;
+    --select-width: 180px;
+    --text-chart-axis: 12px;
+    --chart-tooltip-radius: calc(var(--radius) * 0.8);
+    --z-sticky: 10;
+    --z-overlay: 40;
+    --z-modal: 50;
 }
 
 /* Dark operations palette: near-black surfaces with a green accent, applied when the OS is in dark mode */
