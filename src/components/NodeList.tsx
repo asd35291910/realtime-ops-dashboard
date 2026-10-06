@@ -1,28 +1,12 @@
 import { useRef } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { Badge } from '@/components/ui/badge'
+import { NodeRow, ROW_HEIGHT } from './NodeRow'
 import type { NodeMetric } from '../types/metrics'
 
 interface NodeListProps {
   nodes: NodeMetric[]
   onNodeSelect?: (node: NodeMetric) => void
   selectedNodeId?: string
-}
-
-// Fixed row height (h-9) so the virtualizer can compute positions without measuring
-const ROW_HEIGHT = 36
-
-const getStatusVariant = (status: string) => {
-  switch (status) {
-    case 'CRITICAL':
-      return 'destructive' as const
-    case 'WARNING':
-      return 'warning' as const
-    case 'OK':
-      return 'success' as const
-    default:
-      return 'secondary' as const
-  }
 }
 
 export function NodeList({ nodes, onNodeSelect, selectedNodeId }: NodeListProps) {
@@ -64,26 +48,12 @@ export function NodeList({ nodes, onNodeSelect, selectedNodeId }: NodeListProps)
           {virtualRows.map((virtualRow) => {
             const node = nodes[virtualRow.index]
             return (
-            <tr
-              key={node.nodeId}
-              style={{ height: ROW_HEIGHT }}
-              tabIndex={0}
-              onClick={() => onNodeSelect?.(node)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') onNodeSelect?.(node)
-              }}
-              className={`cursor-pointer border-t border-border hover:bg-muted/40 focus-visible:bg-muted/40 outline-none ${
-                selectedNodeId === node.nodeId ? 'bg-muted/60' : ''
-              }`}
-            >
-              <td className="px-4 py-1.5 font-mono">{node.nodeId}</td>
-              <td className="px-4 py-1.5">
-                <Badge variant={getStatusVariant(node.status)}>{node.status}</Badge>
-              </td>
-              <td className="px-4 py-1.5 text-right font-semibold tabular-nums">{node.cpu}%</td>
-              <td className="px-4 py-1.5 text-right font-semibold tabular-nums">{node.memory}%</td>
-              <td className="px-4 py-1.5 text-right font-semibold tabular-nums">{node.latency}ms</td>
-            </tr>
+              <NodeRow
+                key={node.nodeId}
+                node={node}
+                isSelected={selectedNodeId === node.nodeId}
+                onSelect={onNodeSelect}
+              />
             )
           })}
           {paddingBottom > 0 && (

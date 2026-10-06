@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useMetricsConnection } from './hooks/useMetricsConnection'
 import { useNodeHistory } from './hooks/useNodeHistory'
 import { useVisibleNodes, type FilterOption } from './hooks/useVisibleNodes'
@@ -43,10 +43,11 @@ function App() {
   const selectedNodeHistory = useNodeHistory(selectedNode)
   const visibleNodes = useVisibleNodes(nodes, activeFilter, activeSort)
 
-  const handleNodeSelect = (node: NodeMetric) => {
+  // Stable reference so memoized rows do not re-render because of this prop
+  const handleNodeSelect = useCallback((node: NodeMetric) => {
     setSelectedNodeId(node.nodeId)
     setIsDetailOpen(true)
-  }
+  }, [])
 
   return (
     <div className="min-h-screen bg-background text-foreground px-6 py-6">
