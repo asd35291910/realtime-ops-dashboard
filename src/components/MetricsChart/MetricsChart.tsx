@@ -1,5 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import type { MetricDataPoint } from '../types/metrics'
+import type { MetricDataPoint } from '../../types/metrics'
 
 interface MetricsChartProps {
   data: MetricDataPoint[]

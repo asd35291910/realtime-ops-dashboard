@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { Badge } from '@/components/ui/badge'
-import type { NodeStatus } from '../types/metrics'
+import type { NodeStatus } from '../../types/metrics'
 
 const VARIANTS = {
   CRITICAL: 'destructive',

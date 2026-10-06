@@ -72,7 +72,7 @@ src/
 ├── App.tsx                  Composes the dashboard
 ├── components/
 │   ├── ui/                  Design system primitives
-│   └── *.tsx                Feature components
+│   └── <Component>/         Feature components, each with its test
 ├── hooks/                   Connection, filtering, selection, history
 ├── stores/metricsStore.ts   Zustand store and selectors
 ├── services/

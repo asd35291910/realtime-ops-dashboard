@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button'
-import type { FilterOption } from '../hooks/useVisibleNodes'
+import type { FilterOption } from '../../hooks/useVisibleNodes'
 import {
   useMetricsStore,
   selectActiveNodes,
   selectCriticalCount,
   selectOkCount,
   selectWarningCount,
-} from '../stores/metricsStore'
+} from '../../stores/metricsStore'
 
 interface NodeFiltersProps {
   activeFilter: FilterOption

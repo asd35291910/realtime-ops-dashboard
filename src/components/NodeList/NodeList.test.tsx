@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
-import { makeNode } from '../test/factories'
-import type { NodeMetric } from '../types/metrics'
+import { makeNode } from '../../test/factories'
+import type { NodeMetric } from '../../types/metrics'
 import { NodeList } from './NodeList'
 
 const VIEWPORT_HEIGHT = 512 // same as the max-h-[32rem] of the list

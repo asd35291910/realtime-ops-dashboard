@@ -7,7 +7,7 @@ import {
   selectAverageLatency,
   selectAverageCpu,
   selectAverageMemory,
-} from '../stores/metricsStore'
+} from '../../stores/metricsStore'
 import { StatsBar } from '@/components/ui/stats-bar'
 
 // Reads the aggregate selectors itself so only this component re-renders when they change

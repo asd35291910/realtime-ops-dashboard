@@ -1,6 +1,6 @@
 import { memo } from 'react'
-import { StatusBadge } from './StatusBadge'
-import type { NodeMetric } from '../types/metrics'
+import { StatusBadge } from '../StatusBadge'
+import type { NodeMetric } from '../../types/metrics'
 
 // Fixed row height (h-9) so the virtualizer can compute positions without measuring
 export const ROW_HEIGHT = 36

@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button'
-import { useEscapeKey } from '../hooks/useEscapeKey'
+import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { MetricCard } from '@/components/ui/metric-card'
-import { MetricsChart } from './MetricsChart'
-import { StatusBadge } from './StatusBadge'
+import { MetricsChart } from '../MetricsChart'
+import { StatusBadge } from '../StatusBadge'
 import { XIcon } from 'lucide-react'
-import type { MetricDataPoint, NodeMetric } from '../types/metrics'
+import type { MetricDataPoint, NodeMetric } from '../../types/metrics'
 
 interface NodeDetailProps {
   node: NodeMetric | null // the modal is open while a node is selected
