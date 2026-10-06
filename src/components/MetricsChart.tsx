@@ -33,8 +33,20 @@ export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
           stroke="var(--muted-foreground)"
           style={{ fontSize: '12px' }}
         />
+        {/* Left axis: CPU and memory (percent), neutral color because two lines share it */}
         <YAxis
+          yAxisId="percent"
+          domain={[0, 100]}
+          tickFormatter={(value) => `${value}%`}
           stroke="var(--muted-foreground)"
+          style={{ fontSize: '12px' }}
+        />
+        {/* Right axis: latency (ms), tinted like the latency line, separate scale so the percent lines are not flattened */}
+        <YAxis
+          yAxisId="latency"
+          orientation="right"
+          tickFormatter={(value) => `${value}ms`}
+          stroke="oklch(0.7 0.18 50)"
           style={{ fontSize: '12px' }}
         />
         <Tooltip
@@ -49,6 +61,7 @@ export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
         <Legend />
         <Line
           type="monotone"
+          yAxisId="percent"
           dataKey="cpu"
           stroke="oklch(0.62 0.19 260)"
           name="CPU %"
@@ -57,6 +70,7 @@ export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
         />
         <Line
           type="monotone"
+          yAxisId="percent"
           dataKey="memory"
           stroke="oklch(0.7 0.17 150)"
           name="Memory %"
@@ -65,6 +79,7 @@ export function MetricsChart({ data, height = 300 }: MetricsChartProps) {
         />
         <Line
           type="monotone"
+          yAxisId="latency"
           dataKey="latency"
           stroke="oklch(0.7 0.18 50)"
           name="Latency (ms)"
