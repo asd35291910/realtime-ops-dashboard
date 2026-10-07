@@ -2,17 +2,15 @@
 
 ## Overview
 
-```
-Mock server        snapshot of every node, every 500 ms
-   │ WebSocket
-   ▼
-WebSocketClient    connects, retries, parses the JSON
-   ▼
-Zustand store      latest snapshot
-   ▼
-Hooks              filter, sort, selection, history
-   ▼
-Components         render
+```mermaid
+flowchart LR
+  Server["Mock server<br/>snapshot every 500 ms"] -->|WebSocket| Client["WebSocketClient<br/>connect, retry, parse JSON"]
+  Client -->|typed snapshot| Hook["useMetricsConnection"]
+  Hook -->|setNodes| Store[("Zustand store<br/>latest snapshot")]
+  Hook -->|status| Banner["ConnectionBanner"]
+  Store --> VN["useVisibleNodes<br/>filter + sort"] --> List["NodeList"]
+  Store --> Sel["useNodeSelection"] --> Hist["useNodeHistory<br/>last 20 readings"] --> Detail["NodeDetail + chart"]
+  Store -.->|selectors| Overview["MetricsOverview"]
 ```
 
 The server sends a full snapshot of every node every 500 ms. The browser keeps the latest snapshot in a store, and the UI derives everything else from it.
@@ -47,6 +45,35 @@ Filtering and sorting run on the full list (not only the visible rows), so a sor
 
 - **Tokens** in `src/index.css`: palette (light and dark, following the OS), status colors (`success`, `warning`, `destructive`), chart colors, row and surface colors derived from `--muted`, and layout values (list height, modal height, chart height, z-index layers).
 - **Primitives** in `src/components/ui/` (Badge, Button, Select, MetricCard, StatsBar) use those tokens and `cva` variants. Feature components (NodeList, NodeDetail, ...) compose them.
+
+```mermaid
+flowchart TD
+  App --> Banner["ConnectionBanner"]
+  App --> Overview["MetricsOverview"] --> StatsBar["ui/stats-bar"]
+  App --> Filters["NodeFilters"]
+  App --> Sort["NodeSort"]
+  App --> List["NodeList (virtualized)"] --> Row["NodeRow (memo)"] --> Badge["StatusBadge (memo)"]
+  App --> Detail["NodeDetail (modal)"]
+  Detail --> Chart["MetricsChart"]
+  Detail --> Card["ui/metric-card"]
+  Detail --> Badge
+```
+
+## Deployment
+
+```mermaid
+flowchart LR
+  Browser["Browser<br/>runs the React app"]
+  subgraph Compose["docker-compose up"]
+    FE["frontend<br/>nginx, port 3000"]
+    SRV["server<br/>node + tsx, port 3001"]
+  end
+  Browser -->|"HTTP :3000 (static build)"| FE
+  Browser <-->|"WebSocket :3001"| SRV
+  FE -.->|depends_on| SRV
+```
+
+nginx only serves the static build and falls back to `index.html` for unknown paths. It does not proxy the WebSocket: the browser connects straight to the server on port 3001, so `VITE_WS_URL` is set at build time.
 
 ## Testing
 
