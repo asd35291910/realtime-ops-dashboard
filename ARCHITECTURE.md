@@ -35,6 +35,16 @@ Measured with a production build, 1500 nodes, Chrome with 4x CPU throttling, in 
 | Rendering        | 1671 ms    | 33–52 ms                                    |
 | Scripting        | 854 ms     | 154–196 ms                                  |
 
+Chrome DevTools recordings of the two ends of the table (same conditions, 10 s):
+
+| Plain list (all 1500 rows in the DOM) | Virtualized list |
+| :-: | :-: |
+| <img src="docs/perf-plain-list.png" alt="Performance recording of the plain list: Painting 3385 ms, frames up to 850 ms" width="420"> | <img src="docs/perf-virtualized.png" alt="Performance recording of the virtualized list: Painting 19 ms, frames at the 500 ms data cadence" width="420"> |
+
+The virtualized recording was taken before the rows were memoized. React DevTools highlighting shows why it is cheap: only the rows near the viewport exist, and the rest of the list is two spacer elements.
+
+<img src="docs/virtualized-rows.png" alt="React DevTools highlight showing only a few NodeRow components mounted out of 1500 nodes" width="560">
+
 The bottleneck was the browser painting and laying out 1500 rows, not React. Virtualization (`@tanstack/react-virtual`) keeps about 30 rows in the DOM and removed almost all of that cost, so it came first. The virtualized column comes from three recordings, one without memoized rows and two with them.
 
 The differences between those recordings are within the noise between runs (tens of milliseconds), so the table does not claim that memoization changed painting or rendering. Memoization lowered scripting slightly (196 ms in the one run without it, 154–161 ms in the two with it). Its main value is that only the rows whose node changed re-render.
