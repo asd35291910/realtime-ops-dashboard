@@ -37,8 +37,8 @@ Measured with a production build, 1500 nodes, Chrome with 4x CPU throttling, in 
 
 Chrome DevTools recordings of the two ends of the table (same conditions, 10 s):
 
-| Plain list (all 1500 rows in the DOM) | Virtualized list |
-| :-: | :-: |
+|                                                 Plain list (all 1500 rows in the DOM)                                                 |                                                                     Virtualized list                                                                     |
+| :-----------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <img src="docs/perf-plain-list.png" alt="Performance recording of the plain list: Painting 3385 ms, frames up to 850 ms" width="420"> | <img src="docs/perf-virtualized.png" alt="Performance recording of the virtualized list: Painting 19 ms, frames at the 500 ms data cadence" width="420"> |
 
 The virtualized recording was taken before the rows were memoized. React DevTools highlighting shows why it is cheap: only the rows near the viewport exist, and the rest of the list is two spacer elements.
@@ -95,8 +95,6 @@ nginx only serves the static build and falls back to `index.html` for unknown pa
 - **Mock server instead of a real backend.** It simulates nodes, incidents and recoveries; it is not meant to be production code.
 - **Full snapshots.** Simple and robust, but wasteful when few nodes change (see below).
 - **Sorting and aggregates are computed in the browser.**
-- **Input latency was not measured with a separate number.** Frames stayed stable at the 500 ms update rate during the recordings.
-- **Light theme is less polished than the dark one.**
 - **Docker:** the server image installs dev dependencies, because the mock server runs with `tsx`, `express` and `ws`, which are dev dependencies. A production backend would ship compiled code only.
 
 ## Scaling to 10,000+ nodes
@@ -106,7 +104,6 @@ Today the browser receives every node on every update. That works for hundreds o
 1. **Paginate by windows, with the server sorting and filtering.** The client asks for a window of the list (for example nodes 4000 to 4999, sorted by CPU, filtered by CRITICAL) instead of all nodes. The server has to do the sorting and filtering because only it has every node. As the user scrolls, the virtualized list asks for the next window.
 2. **Send only changes, only for the visible window.** The client subscribes to the window it is showing, and the server pushes just the nodes of that window that changed, instead of a full snapshot.
 3. **Compute the overview on the server.** The counters (total, critical, averages) cannot be calculated in the browser once it no longer holds every node, so they arrive already computed.
-4. **Batch updates per frame.** Messages are collected and applied once per screen redraw (`requestAnimationFrame`), instead of redrawing for every message.
-5. **Parse in a Web Worker.** Turning large JSON messages into objects can freeze the page, so it can be done in a separate thread.
+4. **Parse in a Web Worker.** Turning large JSON messages into objects can freeze the page, so it can be done in a separate thread.
 
 Rendering cost does not grow with the number of nodes, because the list is already virtualized.
