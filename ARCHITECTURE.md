@@ -6,9 +6,7 @@
 Mock server        snapshot of every node, every 500 ms
    │ WebSocket
    ▼
-WebSocketClient    connects and retries
-   ▼
-MetricsWebSocketService   parses the JSON
+WebSocketClient    connects, retries, parses the JSON
    ▼
 Zustand store      latest snapshot
    ▼
@@ -22,7 +20,7 @@ The server sends a full snapshot of every node every 500 ms. The browser keeps t
 ## Architecture decisions and state strategy
 
 - **Server data lives in one Zustand store; UI state lives next to the UI.** The store only holds the node snapshot. Filter and sort are `useState` in `App`, and the selected node is in `useNodeSelection`. The client never edits a node, so the store has a single write: `setNodes`.
-- **Layers with one job each.** `WebSocketClient` is transport (connect, exponential backoff from 1 s to 10 s). `MetricsWebSocketService` is protocol (parse a snapshot). The store is state. Components only render. Business logic sits in hooks and services, not in JSX.
+- **Layers with one job each.** `WebSocketClient` is transport and wire format (connect, exponential backoff from 1 s to 10 s, parse the JSON into a typed message). The store is state. Components only render. Business logic sits in hooks and services, not in JSX.
 - **Stable references for unchanged nodes.** `JSON.parse` creates new objects for every node on every snapshot, which would defeat `React.memo`. The server only changes a node's `timestamp` when that node is measured again, so `setNodes` reuses the previous object when the timestamp matches. Rows are memoized (`NodeRow`, `StatusBadge`), so only rows whose node changed re-render. This relies on that contract between server and client.
 - **Selectors return primitives.** Counts and averages are plain functions over the node list. They are not cached; Zustand skips the re-render when the returned number is unchanged. `MetricsOverview` and `NodeFilters` read their own selectors, so `App` does not re-render when a count changes.
 - **The chart history stores readings, not ticks.** `useNodeHistory` keeps the last 20 readings of the selected node and adds one only when the node actually changed. The chart waits for two readings, since one point cannot draw a line. Closing the detail clears the history.

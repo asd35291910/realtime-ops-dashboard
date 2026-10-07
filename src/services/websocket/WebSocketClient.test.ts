@@ -48,13 +48,25 @@ describe('WebSocketClient', () => {
     expect(lastSocket().url).toBe('ws://example.test')
   })
 
-  it('passes the received messages to onMessage', () => {
+  it('passes the received messages to onMessage, parsed from JSON', () => {
     const onMessage = vi.fn()
     new WebSocketClient('ws://x', { onMessage }).connect()
 
     lastSocket().onmessage?.({ data: '{"nodes":[]}' })
 
-    expect(onMessage).toHaveBeenCalledWith('{"nodes":[]}')
+    expect(onMessage).toHaveBeenCalledWith({ nodes: [] })
+  })
+
+  it('drops a message that is not valid JSON and keeps the connection', () => {
+    const onMessage = vi.fn()
+    new WebSocketClient('ws://x', { onMessage }).connect()
+    const socket = lastSocket()
+
+    socket.onmessage?.({ data: 'not json' })
+
+    expect(onMessage).not.toHaveBeenCalled()
+    expect(socket.closeCalls).toBe(0)
+    expect(socket.onmessage).not.toBeNull()
   })
 
   it('reports open, error and close through the callbacks', () => {

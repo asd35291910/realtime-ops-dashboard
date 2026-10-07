@@ -1,6 +1,6 @@
-export interface WebSocketClientCallbacks {
+export interface WebSocketClientCallbacks<T> {
   onOpen?: () => void
-  onMessage?: (data: string) => void
+  onMessage?: (message: T) => void
   onError?: (error: Event) => void
   onClose?: () => void
 }
@@ -8,14 +8,14 @@ export interface WebSocketClientCallbacks {
 const INITIAL_RECONNECT_DELAY_MS = 1000
 const MAX_RECONNECT_DELAY_MS = 10000
 
-export class WebSocketClient {
+export class WebSocketClient<T = unknown> {
   private ws: WebSocket | null = null
   private url: string
   private reconnectDelay = INITIAL_RECONNECT_DELAY_MS
   private reconnectTimeout: number | null = null
-  private callbacks: WebSocketClientCallbacks = {}
+  private callbacks: WebSocketClientCallbacks<T> = {}
 
-  constructor(url: string, callbacks?: WebSocketClientCallbacks) {
+  constructor(url: string, callbacks?: WebSocketClientCallbacks<T>) {
     this.url = url
     if (callbacks) {
       this.callbacks = callbacks
@@ -35,7 +35,16 @@ export class WebSocketClient {
     }
 
     socket.onmessage = (event) => {
-      this.callbacks.onMessage?.(event.data)
+      // The wire format is JSON. A malformed message is dropped so it cannot break the connection.
+      // Only the parse is guarded, so an error thrown by onMessage is not hidden as a parse failure.
+      let message: T
+      try {
+        message = JSON.parse(event.data)
+      } catch (error) {
+        console.error('Failed to parse WebSocket message:', error)
+        return
+      }
+      this.callbacks.onMessage?.(message)
     }
 
     socket.onerror = (error) => {

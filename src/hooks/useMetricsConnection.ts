@@ -1,25 +1,19 @@
 import { useEffect } from 'react'
 import { useMetricsStore } from '../stores/metricsStore'
-import { MetricsWebSocketService } from '../services/websocket/MetricsWebSocketService'
+import { WebSocketClient } from '../services/websocket/WebSocketClient'
+import type { MetricsSnapshot } from '../types/metrics'
 
 export function useMetricsConnection(url: string) {
   const setNodes = useMetricsStore((state) => state.setNodes)
 
   useEffect(() => {
-    // Create service instance
-    const service = new MetricsWebSocketService(url)
-
-    // Subscribe to messages and update store
-    service.onMessage((snapshot) => {
-      setNodes(snapshot.nodes)
+    const client = new WebSocketClient<MetricsSnapshot>(url, {
+      onMessage: (snapshot) => setNodes(snapshot.nodes),
     })
 
-    // Connect
-    service.connect()
+    client.connect()
 
     // Cleanup on unmount
-    return () => {
-      service.disconnect()
-    }
+    return () => client.disconnect()
   }, [url, setNodes])
 }
