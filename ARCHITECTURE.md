@@ -24,6 +24,7 @@ The server sends a full snapshot of every node every 500 ms. The browser keeps t
 - **Stable references for unchanged nodes.** `JSON.parse` creates new objects for every node on every snapshot, which would defeat `React.memo`. The server only changes a node's `timestamp` when that node is measured again, so `setNodes` reuses the previous object when the timestamp matches. Rows are memoized (`NodeRow`, `StatusBadge`), so only rows whose node changed re-render. This relies on that contract between server and client.
 - **Selectors return primitives.** Counts and averages are plain functions over the node list. They are not cached; Zustand skips the re-render when the returned number is unchanged. `MetricsOverview` and `NodeFilters` read their own selectors, so `App` does not re-render when a count changes.
 - **The chart history stores readings, not ticks.** `useNodeHistory` keeps the last 20 readings of the selected node and adds one only when the node actually changed. The chart waits for two readings, since one point cannot draw a line. Closing the detail clears the history.
+- **Connection status is explicit.** `useMetricsConnection` returns `connecting | connected | disconnected` from the client's open and close callbacks, and `ConnectionBanner` shows it whenever the link is not live, so frozen data is not mistaken for live data. It does not detect stale data on an open socket; a "last update" age would cover that.
 - **Strict TypeScript, no `any`.** Shared types live in `src/types/metrics.ts`.
 
 ## Performance
