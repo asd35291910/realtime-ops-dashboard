@@ -3,9 +3,10 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import App from './App'
 import { useMetricsStore } from './stores/metricsStore'
 import { makeNode } from './test/factories'
+import { useMetricsConnection } from './hooks/useMetricsConnection'
 
 // No real WebSocket in tests: the store is filled by hand instead
-vi.mock('./hooks/useMetricsConnection', () => ({ useMetricsConnection: vi.fn() }))
+vi.mock('./hooks/useMetricsConnection', () => ({ useMetricsConnection: vi.fn(() => 'connected') }))
 // Recharts needs ResizeObserver, which jsdom does not have; the chart is not what these tests cover
 vi.mock('./components/MetricsChart', () => ({ MetricsChart: () => <div data-testid="metrics-chart" /> }))
 
@@ -34,6 +35,19 @@ describe('App', () => {
   beforeEach(() => {
     useMetricsStore.getState().reset()
     useMetricsStore.getState().setNodes(nodes)
+  })
+
+  it('shows no connection banner while connected', () => {
+    render(<App />)
+
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+
+  it('warns the user when the connection is lost', () => {
+    vi.mocked(useMetricsConnection).mockReturnValueOnce('disconnected')
+    render(<App />)
+
+    expect(screen.getByRole('alert').textContent).toContain('Connection lost')
   })
 
   it('renders the dashboard title', () => {

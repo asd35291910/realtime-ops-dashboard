@@ -8,13 +8,14 @@ import { NodeList } from './components/NodeList'
 import { NodeFilters } from './components/NodeFilters'
 import { NodeSort, type SortOption } from './components/NodeSort'
 import { NodeDetail } from './components/NodeDetail'
+import { ConnectionBanner } from './components/ConnectionBanner'
 
 // The browser connects to the mock server, so in Docker this must be a host-reachable URL.
 // Override it with VITE_WS_URL at build time; the default is for local development.
 const WS_URL = (import.meta.env.VITE_WS_URL as string | undefined) ?? 'ws://localhost:3001'
 
 function App() {
-  useMetricsConnection(WS_URL)
+  const connectionStatus = useMetricsConnection(WS_URL)
 
   const nodes = useMetricsStore((state) => state.nodes)
   const totalNodes = useMetricsStore(selectActiveNodes)
@@ -35,6 +36,8 @@ function App() {
             Monitoring {totalNodes} nodes with live metrics
           </p>
         </div>
+
+        <ConnectionBanner status={connectionStatus} />
 
         <MetricsOverview />
 
